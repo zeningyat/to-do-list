@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>todo-list</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9;
+      --color-surface-offset: #edeae5; --color-border: #d4d1ca; --color-text: #28251d;
+      --color-text-muted: #7a7974; --color-primary: #01696f; --color-primary-hover: #0c4e54;
+      --color-primary-highlight: #cedcd8; --color-success: #437a22; --color-error: #a12c7b;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --shadow-sm: 0 1px 2px rgba(40,37,29,.06); --shadow-md: 0 10px 30px rgba(40,37,29,.10);
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      --font-body: 'Work Sans', system-ui, sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d;
+      --color-surface-offset: #22211f; --color-border: #393836; --color-text: #cdccca;
+      --color-text-muted: #979591; --color-primary: #4f98a3; --color-primary-hover: #227f8b;
+      --color-primary-highlight: #313b3b; --color-success: #6daa45; --color-error: #d163a7;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.2); --shadow-md: 0 12px 32px rgba(0,0,0,.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+    body {
+      min-height: 100dvh; font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6;
+      color: var(--color-text); background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 40%),
+      var(--color-bg);
+      display: grid; place-items: center; padding: var(--space-4);
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; border: none; transition: transform var(--transition), background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition); }
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    input:focus-visible, button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+    .app {
+      width: min(100%, 760px); background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent); border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md); backdrop-filter: blur(10px); overflow: hidden;
+    }
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center; gap: var(--space-4);
+      padding: var(--space-5); border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+      background: color-mix(in srgb, var(--color-surface-2) 86%, transparent);
+    }
+    .brand { display: flex; align-items: center; gap: var(--space-3); }
+    .logo {
+      width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center;
+      background: var(--color-primary-highlight); color: var(--color-primary);
+    }
+    .brand h1 { font-size: var(--text-xl); line-height: 1; }
+    .brand p { font-size: var(--text-sm); color: var(--color-text-muted); }
+    .theme-toggle {
+      min-width: 44px; min-height: 44px; border-radius: 999px; background: var(--color-surface-offset);
+      color: var(--color-text);
+    }
+    .content { padding: var(--space-5); display: grid; gap: var(--space-5); }
+    .hero-card {
+      padding: var(--space-5); border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-primary-highlight), color-mix(in srgb, var(--color-surface) 82%, white));
+      display: grid; gap: var(--space-2);
+    }
+    .hero-card p { color: var(--color-text-muted); max-width: 50ch; }
+    .form {
+      display: grid; grid-template-columns: 1fr auto; gap: var(--space-3);
+    }
+    .input {
+      min-height: 52px; width: 100%; padding: 0 var(--space-4); border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text);
+    }
+    .add-btn {
+      min-height: 52px; min-width: 120px; padding: 0 var(--space-5); border-radius: var(--radius-lg);
+      background: var(--color-primary); color: white; box-shadow: var(--shadow-sm);
+    }
+    .add-btn:hover { background: var(--color-primary-hover); }
+    .stats { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    .stat {
+      flex: 1 1 160px; padding: var(--space-4); border-radius: var(--radius-lg); background: var(--color-surface-2);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+    }
+    .stat span { display: block; font-size: var(--text-sm); color: var(--color-text-muted); }
+    .stat strong { font-size: var(--text-lg); }
+    .list-wrap {
+      padding: var(--space-4); border-radius: var(--radius-lg); background: var(--color-surface-2);
+      border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+    }
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); flex-wrap: wrap;
+      margin-bottom: var(--space-4);
+    }
+    .clear-btn {
+      min-height: 44px; padding: 0 var(--space-4); border-radius: 999px; background: transparent;
+      border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent); color: var(--color-text);
+    }
+    .task-list { list-style: none; display: grid; gap: var(--space-3); }
+    .task {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-3);
+      padding: var(--space-4); border-radius: var(--radius-lg); background: var(--color-surface);
+      border: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
+    }
+    .task.done { opacity: .72; }
+    .task.done .task-text { text-decoration: line-through; color: var(--color-text-muted); }
+    .check {
+      width: 24px; height: 24px; border-radius: 999px; border: 2px solid var(--color-primary);
+      background: transparent; display: grid; place-items: center; color: white;
+    }
+    .task.done .check { background: var(--color-success); border-color: var(--color-success); }
+    .delete {
+      min-width: 44px; min-height: 44px; border-radius: 999px; background: color-mix(in srgb, var(--color-error) 12%, transparent);
+      color: var(--color-error);
+    }
+    .empty {
+      padding: var(--space-8) var(--space-4); text-align: center; color: var(--color-text-muted);
+      border: 1px dashed color-mix(in srgb, var(--color-text) 14%, transparent); border-radius: var(--radius-lg);
+    }
+    .footer-note { font-size: var(--text-sm); color: var(--color-text-muted); text-align: center; }
+    @media (max-width: 640px) {
+      .form { grid-template-columns: 1fr; }
+      .add-btn { width: 100%; }
+      .topbar { align-items: flex-start; }
+      .brand h1 { font-size: 1.6rem; }
+      .task { grid-template-columns: auto 1fr; }
+      .delete { grid-column: 2; justify-self: end; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>Minha To-Do List</h1>
+        </div>
+      </div>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <section class="content">
+      <div class="hero-card">
+        <h2>Organiza tarefas</h2>
+      </div>
+
+      <form class="form" id="taskForm">
+        <label class="sr-only" for="taskInput">Nova tarefa</label>
+        <input class="input" id="taskInput" type="text" placeholder="Ex.: Estudar JavaScript por 30 minutos" maxlength="120" />
+        <button class="add-btn" type="submit">Adicionar</button>
+      </form>
+
+      <div class="stats">
+        <div class="stat"><span>Total</span><strong id="totalCount">0</strong></div>
+        <div class="stat"><span>Concluídas</span><strong id="doneCount">0</strong></div>
+        <div class="stat"><span>Pendentes</span><strong id="pendingCount">0</strong></div>
+      </div>
+
+      <section class="list-wrap" aria-labelledby="listaTitulo">
+        <div class="toolbar">
+          <div>
+            <h3 id="listaTitulo">Tarefas</h3>
+            <p class="footer-note">Usa esta base e depois personaliza cores, layout e funcionalidades.</p>
+          </div>
+          <button class="clear-btn" id="clearDone" type="button">Limpar concluídas</button>
+        </div>
+        <ul class="task-list" id="taskList"></ul>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const root = document.documentElement;
+    let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    root.setAttribute('data-theme', theme);
+
+    const themeToggle = document.querySelector('[data-theme-toggle]');
+    const taskForm = document.getElementById('taskForm');
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+    const totalCount = document.getElementById('totalCount');
+    const doneCount = document.getElementById('doneCount');
+    const pendingCount = document.getElementById('pendingCount');
+    const clearDone = document.getElementById('clearDone');
+
+    let tasks = [
+      { id: 1, text: 'tarefa 1', done: true },
+      { id: 2, text: 'tarefa 2', done: false },
+      { id: 3, text: 'tarefa 3', done: false }
+    ];
+
+    function updateThemeIcon() {
+      themeToggle.innerHTML = theme === 'dark'
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+
+      if (!tasks.length) {
+        taskList.innerHTML = '<li class="empty">Ainda não tens tarefas. Adiciona a primeira para começar.</li>';
+      } else {
+        tasks.forEach(task => {
+          const li = document.createElement('li');
+          li.className = `task ${task.done ? 'done' : ''}`;
+          li.innerHTML = `
+            <button class="check" type="button" aria-label="Marcar tarefa" data-action="toggle" data-id="${task.id}">
+              ${task.done ? '✓' : ''}
+            </button>
+            <span class="task-text">${task.text}</span>
+            <button class="delete" type="button" aria-label="Apagar tarefa" data-action="delete" data-id="${task.id}">✕</button>
+          `;
+          taskList.appendChild(li);
+        });
+      }
+
+      const total = tasks.length;
+      const done = tasks.filter(task => task.done).length;
+      totalCount.textContent = total;
+      doneCount.textContent = done;
+      pendingCount.textContent = total - done;
+    }
+
+    taskForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const text = taskInput.value.trim();
+      if (!text) return;
+      tasks.unshift({ id: Date.now(), text, done: false });
+      taskInput.value = '';
+      renderTasks();
+      taskInput.focus();
+    });
+
+    taskList.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      const id = Number(button.dataset.id);
+      const action = button.dataset.action;
+
+      if (action === 'toggle') {
+        tasks = tasks.map(task => task.id === id ? { ...task, done: !task.done } : task);
+      }
+
+      if (action === 'delete') {
+        tasks = tasks.filter(task => task.id !== id);
+      }
+
+      renderTasks();
+    });
+
+    clearDone.addEventListener('click', () => {
+      tasks = tasks.filter(task => !task.done);
+      renderTasks();
+    });
+
+    themeToggle.addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', theme);
+      updateThemeIcon();
+    });
+
+    updateThemeIcon();
+    renderTasks();
+  </script>
+</body>
+</html>
